@@ -11,7 +11,7 @@ app.listen(PORT, () => {
     console.log('⚠️  WARNING: Groq API key not set in .env!');
     console.log('   Please set your free key at: https://console.groq.com');
   } else {
-    console.log('🔑 Groq API key is set — advisor is ready!');
+    console.log('🔑 AI advisor is ready!');
   }
   if (process.env.OPENROUTER_API_KEY) {
     console.log(`🔑 OpenRouter API key is set (provider: ${process.env.AI_PROVIDER || 'openrouter'}, model: ${process.env.OPENROUTER_MODEL || 'default'})`);
