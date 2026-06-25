@@ -1,0 +1,1730 @@
+/* ==========================================================================
+   1. DESIGN SYSTEM VARIABLES (Luxury Matte Black Palette)
+   ========================================================================== */
+:root {
+  /* Color Architectural System */
+  --bg: #0a0a0c;
+  --bg2: #121216;
+  --bg3: #1a1a22;
+  --surface: #111115;
+  --border: rgba(255, 255, 255, 0.07);
+  --border-hover: rgba(255, 255, 255, 0.15);
+  
+  /* Typography Scale Colors */
+  --text: #f3f4f6;
+  --text2: #9ca3af;
+  --text3: #6b7280;
+  
+  /* Accent Channels */
+  --blue: #3b82f6;
+  --blue-glow: rgba(59, 130, 246, 0.15);
+  --danger: #ef4444;
+  --warn: #f59e0b;
+  
+  /* Typography Families */
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --mono: 'JetBrains Mono', 'Fira Code', monospace;
+  
+  /* Structural Breakpoint Math */
+  --sidebar-width: 280px;
+}
+
+/* Reset Defaults */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ==========================================================================
+   2. CORE WORKSPACE MECHANICS (.main-content Responsive Push)
+   ========================================================================== */
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  width: 100%;
+  padding-left: 0;
+  padding-top: 60px; /* Space for fixed mobile top header bar */
+  padding-bottom: 80px; /* Space for sticky thumb layout menu on mobile devices */
+  transition: padding-left 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), 
+              width 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+}
+
+/* Base Central Blueprint Bounds */
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Desktop Geometry Adaptive Rescales */
+@media (min-width: 992px) {
+  .main-content {
+    padding-top: 24px;
+    padding-bottom: 24px;
+    padding-left: var(--sidebar-width); /* Forces canvas left offset instantly */
+  }
+
+  /* Dynamic modifier class appended runtime to keep layout responsive */
+  .main-content.open-sidebar {
+    padding-left: var(--sidebar-width);
+    width: 100%;
+  }
+}
+
+/* ==========================================================================
+   3. SIDEBAR PANEL INTERACTION COMPONENT
+   ========================================================================== */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -280px; /* Safely stowed away outside view frame for touch widths */
+  width: var(--sidebar-width);
+  height: 100vh;
+  background-color: var(--surface);
+  border-right: 1px solid var(--border);
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 4px 0 32px rgba(0, 0, 0, 0.5);
+}
+
+/* Brand Area Signature Typography */
+.sidebar-brand {
+  padding: 24px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--text);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  text-transform: lowercase;
+}
+
+.sidebar-brand span {
+  color: var(--blue);
+  font-style: normal;
+}
+
+/* Navigation List Nodes */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px 14px;
+  list-style: none;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: var(--text2);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.sidebar-link i {
+  font-size: 18px;
+  color: var(--text3);
+}
+
+/* Link Actions Matrix States */
+.sidebar-link:hover {
+  color: var(--text);
+  background-color: var(--bg3);
+}
+
+.sidebar-link.active {
+  color: #ffffff;
+  background-color: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+.sidebar-link.active i {
+  color: var(--blue);
+}
+
+/* Sidebar Option Blocks Footer */
+.sidebar-footer {
+  padding: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: auto;
+}
+
+/* State Trigger Class via Context Layout */
+.sidebar.open {
+  transform: translateX(280px);
+}
+
+/* Desktop Panel Persistence Anchor Overrides */
+@media (min-width: 992px) {
+  .sidebar {
+    left: 0 !important; /* Fixed left-docked position */
+    transform: none !important;
+    box-shadow: none;
+  }
+}
+
+/* ==========================================================================
+   4. DEVICE NAVIGATION (Mobile Top Headers & Sticky Bottom Trays)
+   ========================================================================== */
+.mobile-top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background: rgba(10, 10, 12, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 400;
+}
+
+.mobile-hamburger {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.mobile-bottom-menu {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 68px;
+  background: rgba(17, 17, 21, 0.85);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  z-index: 400;
+}
+
+.mobile-menu-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--text3);
+  text-decoration: none;
+  font-size: 10px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.mobile-menu-item i {
+  font-size: 20px;
+}
+
+.mobile-menu-item:hover,
+.mobile-menu-item.active {
+  color: var(--blue);
+}
+
+/* Clear Navigation UI Overlaps on Standard High-Resolution Views */
+@media (min-width: 992px) {
+  .mobile-top-bar,
+  .mobile-bottom-menu {
+    display: none !important;
+  }
+}
+
+/* Backdrop Dimmer Overlay mask */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 450;
+  animation: fadeIn 0.2s ease forwards;
+}
+
+/* ==========================================================================
+   5. COMPONENT ELEMENT STYLES (Cards, Grids, and Analytics Metric Tiles)
+   ========================================================================== */
+.section-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.section-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text2);
+}
+
+/* StatsBar Grid Architecture */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .stats-bar {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.stat-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  text-align: center;
+}
+
+.stat-num {
+  font-size: 28px;
+  font-weight: 800;
+  font-family: var(--mono);
+  letter-spacing: -1px;
+}
+
+.stat-lbl {
+  font-size: 11px;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+/* MetricGrid Modules */
+.metric-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .metric-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.metric-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+.metric-card:focus, .metric-card:hover {
+  outline: none;
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+}
+
+.metric-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text2);
+  font-weight: 600;
+}
+
+.metric-value {
+  font-size: 32px;
+  font-weight: 800;
+  font-family: var(--mono);
+  margin: 12px 0 4px 0;
+}
+
+.metric-delta {
+  font-size: 12px;
+  margin-bottom: 14px;
+}
+
+.metric-mini-bar {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.metric-mini-fill {
+  height: 100%;
+  border-radius: 2px;
+}
+
+/* GaugeRow Panel Framework */
+.gauge-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .gauge-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.gauge-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px;
+}
+
+.gauge-label {
+  font-size: 12px;
+  color: var(--text3);
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.gauge-value {
+  font-size: 22px;
+  font-weight: 800;
+  margin: 6px 0 2px 0;
+  letter-spacing: -0.5px;
+}
+
+.gauge-sub {
+  font-size: 12px;
+  color: var(--text2);
+}
+
+/* SignalList Row Components */
+.signal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.signal-row {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color 0.2s;
+}
+
+@media (min-width: 576px) {
+  .signal-row {
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+  }
+}
+
+.signal-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.sig-red { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+.sig-warn { background: rgba(245, 158, 11, 0.1); color: var(--warn); }
+
+.signal-text {
+  flex: 1;
+}
+
+.signal-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.signal-detail {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 2px;
+}
+
+.sig-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+@media (min-width: 576px) {
+  .sig-bar-wrap {
+    width: 180px;
+  }
+}
+
+.sig-track {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.sig-fill {
+  height: 100%;
+}
+
+.sig-pct {
+  font-size: 12px;
+  font-family: var(--mono);
+  color: var(--text2);
+  width: 36px;
+  text-align: right;
+}
+
+/* RecoveryCard Custom Action Trays */
+.recovery-card {
+  background: linear-gradient(145deg, #111115 0%, #0d0d11 100%);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.recovery-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.recovery-steps-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.recovery-step {
+  display: flex;
+  gap: 16px;
+}
+
+.step-num {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--blue);
+  background: rgba(59, 130, 246, 0.08);
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.step-text {
+  flex: 1;
+}
+
+.step-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.step-desc {
+  font-size: 12.5px;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-top: 4px;
+}
+
+/* ==========================================================================
+   6. INTERACTIVE ACTION ELEMENTS AND RESPONSIVE MICRO-SCALING (< 300px)
+   ========================================================================== */
+.btn-sm {
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: var(--sans);
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  min-height: 36px;
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text2);
+}
+
+.btn-ghost:hover {
+  background: var(--bg3);
+  border-color: var(--border-hover);
+  color: var(--text);
+}
+
+.btn-blue {
+  background: var(--blue);
+  color: #fff;
+}
+
+.btn-blue:hover {
+  background: #2563eb;
+  box-shadow: 0 0 14px var(--blue-glow);
+}
+
+/* Keyframe Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Ultra-Slim Screen Scalings */
+@media (max-width: 340px) {
+  .stats-bar {
+    grid-template-columns: 1fr !important;
+  }
+  .stat-num {
+    font-size: 24px;
+  }
+  .metric-value {
+    font-size: 26px;
+  }
+  .recovery-card {
+    padding: 16px;
+  }
+  .btn-sm {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ==========================================================================
+   7. HIGH FIDELITY RESPONSIVE AI CHAT SYSTEM
+   ========================================================================== */
+.ai-chat-section {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  height: calc(100vh - 140px); /* Perfectly fills structural frames */
+  min-height: 500px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Header Component Configuration */
+.ai-chat-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: rgba(17, 17, 21, 0.4);
+  backdrop-filter: blur(8px);
+}
+
+.ai-header-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0; /* Prevents text overflow */
+}
+
+.ai-avatar {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--blue) 0%, #1d4ed8 100%);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.25);
+}
+
+.ai-avatar i {
+  color: #fff;
+  font-size: 18px;
+}
+
+.ai-profile-txt {
+  min-width: 0;
+}
+
+.ai-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ai-role {
+  font-size: 11px;
+  color: var(--text2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+
+/* Quick Prompts Swipe Layer Layout */
+.quick-prompts-container {
+  padding: 12px 16px 4px 16px;
+  overflow-x: auto;
+  scrollbar-width: none; /* Hides scrollbar on Firefox */
+}
+
+.quick-prompts-container::-webkit-scrollbar {
+  display: none; /* Hides scrollbar on Chrome/Safari */
+}
+
+.quick-prompts {
+  display: flex;
+  gap: 8px;
+  width: max-content; /* Guarantees layout doesn't smash flex items squished */
+}
+
+.qp-btn {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.qp-btn:hover {
+  background: var(--bg3);
+  border-color: var(--border-hover);
+  color: var(--text);
+  transform: translateY(-1px);
+}
+
+/* Central Core Message Display Scroller Panel */
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: linear-gradient(180deg, transparent 0%, rgba(10, 10, 12, 0.15) 100%);
+}
+
+.msg {
+  display: flex;
+  gap: 12px;
+  max-width: 85%;
+  animation: fadeIn 0.25s ease forwards;
+}
+
+.msg-user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.msg-av {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--mono);
+}
+
+.av-ai { background: var(--bg3); color: var(--blue); border: 1px solid var(--border); }
+.av-user { background: var(--blue); color: #fff; }
+
+.msg-bubble {
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  word-break: break-word;
+}
+
+.bubble-ai {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-top-left-radius: 4px;
+}
+
+.bubble-user {
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: #fff;
+  border-top-right-radius: 4px;
+}
+
+/* User Input Engine Form Components */
+.chat-input-wrapper {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  background: rgba(17, 17, 21, 0.6);
+  backdrop-filter: blur(12px);
+}
+
+.chat-input-row {
+  display: flex;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 6px 8px 6px 14px;
+  align-items: center;
+  gap: 8px;
+  transition: border-color 0.2s ease;
+}
+
+.chat-input-row:focus-within {
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.chat-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  resize: none;
+  outline: none;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 13.5px;
+  padding: 8px 0;
+  max-height: 100px;
+}
+
+.chat-send {
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  padding: 0 16px;
+  height: 36px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.chat-send:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.chat-send:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.chat-disclaimer {
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 10px;
+  text-align: center;
+}
+
+/* Typing Indicator Animation Module */
+.flex-center { display: flex; align-items: center; gap: 4px; padding: 6px 4px; }
+.typing-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--text3);
+  border-radius: 50%;
+  animation: pulse 1.2s infinite ease-in-out;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes pulse {
+  0%, 100% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+
+/* ==========================================================================
+   MOBILE & VIEWPORT DOWN-SCALING RECTIFICATIONS (< 768px)
+   ========================================================================== */
+@media (max-width: 767px) {
+  .ai-chat-section {
+    height: calc(100vh - 160px); /* Compensate adjustments for dynamic headers */
+    border-radius: 12px;
+  }
+  .ai-role {
+    display: none; /* Drops secondary lines for dynamic width safety */
+  }
+  .msg {
+    max-width: 92%; /* Widens columns for better reading layouts */
+  }
+  .chat-send span {
+    display: none; /* Condenses button sizes cleanly by stripping textual elements */
+  }
+  .chat-send {
+    padding: 0;
+    width: 36px;
+    justify-content: center;
+  }
+  .chat-send i {
+    font-size: 14px;
+    margin: 0;
+  }
+}
+
+@media (max-width: 340px) {
+  .ai-chat-header {
+    padding: 12px;
+  }
+  .chat-messages {
+    padding: 12px;
+  }
+  .msg-bubble {
+    font-size: 12.5px;
+    padding: 10px 12px;
+  }
+}
+
+/* MobileNav Component Styles */
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 68px;
+  background: rgba(17, 17, 21, 0.85);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  z-index: 400;
+}
+
+.mbn-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--text3);
+  text-decoration: none;
+  font-size: 10px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.mbn-tab i {
+  font-size: 20px;
+}
+
+.mbn-tab:hover,
+.mbn-tab.active {
+  color: var(--blue);
+}
+
+@media (min-width: 992px) {
+  .mobile-bottom-nav {
+    display: none;
+  }
+}
+
+/* ScoreCard animation */
+.dash-anim-4 {
+  animation: fadeIn 0.4s ease forwards;
+  animation-delay: 0.4s;
+  opacity: 0;
+}
+
+/* AIChat status badge */
+.ai-status {
+  display: flex;
+  align-items: center;
+}
+
+.nav-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text2);
+  background: var(--bg3);
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  display: inline-block;
+}
+
+/* Hero floating elements */
+.float1, .float2, .float3 {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* CheckInForm result box */
+.result-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  margin-top: 16px;
+}
+
+/* CheckInForm tip row */
+.tip-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: var(--bg2);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  margin-top: 12px;
+}
+
+/* ==========================================================================
+   8. NAVBAR COMPONENT STYLES
+   ========================================================================== */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  padding: 0 20px;
+  background: rgba(10, 10, 12, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 300;
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+
+.nav-logo em {
+  font-style: normal;
+  color: var(--blue);
+}
+
+.nav-logo-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
+}
+
+.nav-tabs {
+  display: none;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-tab {
+  color: var(--text3);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 14px;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.nav-tab:hover {
+  color: var(--text);
+  background: var(--bg3);
+}
+
+.nav-tab.active {
+  color: #fff;
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.nav-right {
+  display: none;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text2);
+  background: var(--bg3);
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  display: inline-block;
+}
+
+.nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.nav-btn:hover {
+  background: var(--bg2);
+  border-color: var(--border-hover);
+  color: var(--text);
+}
+
+@media (min-width: 992px) {
+  .nav-tabs,
+  .nav-right {
+    display: flex;
+  }
+}
+
+/* ==========================================================================
+   9. HERO COMPONENT STYLES
+   ========================================================================== */
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 40px 28px;
+  min-height: 320px;
+}
+
+.hero-scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 255, 255, 0.008) 2px,
+    rgba(255, 255, 255, 0.008) 4px
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 30px 30px;
+  mask-image: radial-gradient(ellipse at top right, black 30%, transparent 70%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hero-glow {
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
+  filter: blur(40px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hero-glow2 {
+  position: absolute;
+  bottom: -80px;
+  left: -40px;
+  width: 260px;
+  height: 260px;
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.08) 0%, transparent 70%);
+  filter: blur(40px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hero-streak {
+  position: absolute;
+  top: 40px;
+  right: 120px;
+  width: 300px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3), transparent);
+  transform: rotate(-25deg);
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 3;
+}
+
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text3);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 14px;
+  margin-bottom: 20px;
+}
+
+.hero-tag i {
+  font-size: 14px;
+  color: var(--blue);
+}
+
+.hero-title {
+  font-size: clamp(24px, 4vw, 38px);
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -0.8px;
+}
+
+.hero-title em {
+  font-style: normal;
+  color: var(--blue);
+  background: linear-gradient(135deg, var(--blue) 0%, #60a5fa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.65;
+  max-width: 640px;
+  margin-bottom: 28px;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.btn-hero {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: var(--sans);
+  transition: all 0.25s ease;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.btn-accent {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+}
+
+.btn-accent:hover {
+  background: #2563eb;
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25);
+  transform: translateY(-2px);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text2);
+  border-color: var(--border);
+}
+
+.btn-ghost:hover {
+  background: var(--bg3);
+  border-color: var(--border-hover);
+  color: var(--text);
+}
+
+.btn-warn {
+  background: rgba(245, 158, 11, 0.12);
+  color: #fcd34d;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.btn-warn:hover {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: rgba(245, 158, 11, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.15);
+}
+
+:hover-sel:active > .float1,
+:hover-sel:active > .float2,
+:hover-sel:active > .float3 {
+}
+
+/* ==========================================================================
+   10. CHART & FORECAST COMPONENT STYLES
+   ========================================================================== */
+.chart-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+.chart-card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.chart-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.chart-sub {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 4px;
+}
+
+.chart-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.cb-up {
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.08);
+  border: 1px solid rgba(74, 222, 128, 0.2);
+}
+
+.cb-down {
+  color: var(--danger);
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.chart-wrap {
+  position: relative;
+  width: 100%;
+  height: 240px;
+}
+
+.forecast-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+}
+
+.forecast-day {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 10px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.forecast-day:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+}
+
+.forecast-day.today {
+  border-color: rgba(59, 130, 246, 0.3);
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.fd-day {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text3);
+  margin-bottom: 10px;
+}
+
+.fd-score {
+  font-size: 22px;
+  font-weight: 800;
+  font-family: var(--mono);
+  margin-bottom: 10px;
+}
+
+.fd-bar {
+  height: 3px;
+  border-radius: 2px;
+  background: var(--border);
+}
+
+/* ==========================================================================
+   11. CHECK-IN FORM COMPONENT STYLES
+   ========================================================================== */
+.checkbox-form {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.slider-group {
+  margin-bottom: 4px;
+}
+
+.slider-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+}
+
+.slider-val {
+  font-family: var(--mono);
+  font-weight: 600;
+  color: var(--blue);
+}
+
+.slider-track {
+  position: relative;
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.slider-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: rgba(59, 130, 246, 0.3);
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.slider-track input[type="range"] {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+  margin: 0;
+}
+
+.slider-track input[type="range"]::-webkit-slider-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--blue);
+  cursor: pointer;
+  position: relative;
+  z-index: 3;
+}
+
+.ci-actions {
+  margin-top: 24px;
+}
+
+.btn-full {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 14px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: var(--sans);
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  gap: 8px;
+}
+
+.btn-blue {
+  background: var(--blue);
+  color: #fff;
+}
+
+.btn-blue:hover {
+  background: #2563eb;
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25);
+}
+
+/* ==========================================================================
+   12. UTILITY & ANIMATION LAYER
+   ========================================================================== */
+.mc-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.metric-card {
+  position: relative;
+  z-index: 1;
+}
+
+.dash-anim-1,
+.dash-anim-2,
+.dash-anim-3,
+.dash-anim-5,
+.dash-anim-8 {
+  animation: fadeIn 0.4s ease forwards;
+  opacity: 0;
+}
+
+.dash-anim-1 { animation-delay: 0.1s; }
+.dash-anim-2 { animation-delay: 0.2s; }
+.dash-anim-3 { animation-delay: 0.3s; }
+.dash-anim-5 { animation-delay: 0.5s; }
+.dash-anim-8 { animation-delay: 0.8s; }
+
+.anim-in {
+  animation: fadeIn 0.4s ease forwards;
+  opacity: 0;
+}
+
+.signal-row.anim-in:nth-child(1) { animation-delay: 0.1s; }
+.signal-row.anim-in:nth-child(2) { animation-delay: 0.15s; }
+.signal-row.anim-in:nth-child(3) { animation-delay: 0.2s; }
+.signal-row.anim-in:nth-child(4) { animation-delay: 0.25s; }
+.signal-row.anim-in:nth-child(5) { animation-delay: 0.3s; }
+
+/* CSS Variables Patch */
+:root {
+  --border2: rgba(255, 255, 255, 0.12);
+  --blue2: rgba(59, 130, 246, 0.25);
+  --danger: #ef4444;
+  --danger-glow: rgba(239, 68, 68, 0.15);
+}
+
+/* ScoreCard Component Styles */
+.score-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.score-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--warn), var(--danger));
+}
+
+.score-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.score-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text3);
+  margin-bottom: 8px;
+}
+
+.score-num {
+  font-size: 56px;
+  font-weight: 800;
+  font-family: var(--mono);
+  letter-spacing: -2px;
+  color: var(--danger);
+  line-height: 1;
+  margin-bottom: 12px;
+}
+
+.score-desc {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.score-desc strong {
+  color: #fcd34d;
+}
+
+.score-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.btn-danger {
+  background: rgba(239, 68, 68, 0.12);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.2);
+}
+
+.score-ring-animated {
+  animation: scoreRingIn 1.5s cubic-bezier(.4,0,.2,1) forwards;
+}
+
+@keyframes scoreRingIn {
+  from { stroke-dashoffset: 251; }
+  to { stroke-dashoffset: 63; }
+}
+
+@media (max-width: 640px) {
+  .score-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .score-num {
+    font-size: 42px;
+  }
+  
+  .score-actions {
+    justify-content: center;
+  }
+}
