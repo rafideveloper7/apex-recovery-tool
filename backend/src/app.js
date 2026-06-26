@@ -10,7 +10,7 @@ const app = express();
 app.use(cors({
   origin: process.env.NODE_ENV === 'development' 
     ? ['http://localhost:3000', 'http://localhost:5000'] 
-    : ['https://*.vercel.app'],
+    : ['https://apexrecovery.vercel.app'],
   credentials: true,
 }));
 app.use(express.json());
