@@ -16,7 +16,7 @@ export default function Home() {
       <Navbar />
       <Hero />
       
-      <div className="content">
+      <div className="w-full h-[fit-content] content bg-white">
         <StatsBar />
         <MetricGrid />
         <GaugeRow />

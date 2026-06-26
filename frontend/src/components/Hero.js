@@ -14,7 +14,7 @@ export default function Hero() {
         <h1 className="hero-title">Free <em>AI Burnout Detection</em> Tool — Know Before You Crash</h1>
         <p className="hero-sub">Your biometric pattern matches a pre-burnout signature. Sleep debt accumulating, HRV trending down, output crashing — the body signals before the mind registers.</p>
 
-        <div style={{ display: "flex", gap: "8px", marginBottom: "20px", flexWrap: "wrap" }}>
+        {/* <div style={{ display: "flex", gap: "8px", marginBottom: "20px", flexWrap: "wrap" }}>
           <div className="float1" style={{ background: "rgba(192,57,43,.15)", border: "1px solid rgba(192,57,43,.3)", borderRadius: "10px", padding: "8px 13px", display: "flex", alignItems: "center", gap: "8px" }}>
             <span style={{ fontSize: "20px" }}>😰</span>
             <div>
@@ -36,7 +36,7 @@ export default function Hero() {
               <div style={{ fontSize: "14px", fontWeight: "700", color: "#93c5fd", fontFamily: "'JetBrains Mono',monospace" }}>38ms</div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <div className="hero-actions">
           <a href="/checkin" className="btn-hero btn-accent"><i className="ti ti-activity"></i> Run Assessment</a>
