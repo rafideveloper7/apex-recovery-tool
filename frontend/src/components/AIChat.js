@@ -29,10 +29,9 @@ export default function AIChat() {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/chat`,
-        { messages: [...messages, userMessage] }
-      );
+      const response = await axios.post('/api/chat', {
+        messages: [...messages, userMessage]
+      });
 
       const aiResponseContent = response.data.text || response.data.content?.[0]?.text || "I am here with you. Can you tell me more?";
       setMessages((prev) => [...prev, { role: "assistant", content: aiResponseContent }]);

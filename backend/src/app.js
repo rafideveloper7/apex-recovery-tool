@@ -7,16 +7,18 @@ dotenv.config({ path: './.env' });
 
 const app = express();
 
-const allowedOrigins = process.env.NODE_ENV === 'development' 
-  ? ['http://localhost:3000', 'http://localhost:5000', 'http://localhost:3001'] 
-  : ['https://apexrecovery.vercel.app', 'https://apexapi-alpha.vercel.app'];
+const allowedOrigins = [
+  'http://localhost:3000', 'http://localhost:5000', 'http://localhost:3001',
+  'https://apexrecovery.vercel.app', 'https://apexapi-alpha.vercel.app',
+  'http://apexrecovery.vercel.app', 'http://apexapi-alpha.vercel.app'
+];
 
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(null, true);
     }
   },
   credentials: true,
