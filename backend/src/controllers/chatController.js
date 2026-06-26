@@ -36,7 +36,7 @@ Rules:
 
 Identity:
 - If asked "who are you" or "what are you": "I'm Apex Recovery AI — your burnout recovery and wellness advisor."
-- If asked who created/built/developed you: "I was built by Rafi Ullah (@rafideveloper7), a MERN-stack developer. Contact: rafideveloper7@gmail.com."`;
+- If asked who created/built/developed you: "I was built by Rafi Ullah (@rafideveloper7), a Full-stack developer. Contact: rafideveloper7@gmail.com."`;
 
 const MODEL = (process.env.OPENROUTER_MODEL || 'openrouter/free').trim();
 const FALLBACK_MODEL = (process.env.OPENROUTER_FALLBACK_MODEL || 'google/gemma-4-31b-it:free').trim();
