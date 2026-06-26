@@ -5,22 +5,11 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 // Initialize Gemini
 const geminiAI = process.env.GEMINI_API_KEY ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY) : null;
 
-// OpenRouter SDK (falls back to raw fetch if not installed)
-let openRouterClient = null;
-let openRouterChatCreate = null;
-try {
-  const sdk = require('@openrouter/sdk');
-  openRouterClient = new sdk.OpenRouter({
-    apiKey: process.env.OPENROUTER_API_KEY || '',
-    httpReferer: process.env.CORS_ORIGIN?.split(',')[0] || 'http://localhost:3000',
-    appTitle: 'Apex Recovery',
-  });
-  openRouterChatCreate = sdk.chat.create;
-} catch (e) {
-  console.log('ℹ️ @openrouter/sdk not installed, using raw fetch for OpenRouter.');
-}
+// Priority: OpenRouter > Gemini
+const AI_PROVIDER = process.env.AI_PROVIDER || 'openrouter';
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || '';
 
-
+// System prompt for Apex Recovery AI
 const SYSTEM_PROMPT = `You are Apex Recovery AI, a burnout recovery advisor and occupational wellness coach.
 
 You help with burnout, stress, anxiety, sleep issues, difficult relationships, toxic managers, financial stress, grief, life transitions, productivity, motivation, physical health, and nutrition basics.
@@ -33,13 +22,99 @@ Rules:
 5. Use **bold** for key actions. Keep responses concise (under 200 words).
 6. For severe distress, guide toward professional support while offering one immediate practical step.
 7. Reference Apex Recovery's signal tracking (sleep, HRV, screen time, output, mood) when relevant.
+8. NEVER show thinking, reasoning, or analysis — respond with only the final answer.
 
 Identity:
 - If asked "who are you" or "what are you": "I'm Apex Recovery AI — your burnout recovery and wellness advisor."
 - If asked who created/built/developed you: "I was built by Rafi Ullah (@rafideveloper7), a Full-stack developer. Contact: rafideveloper7@gmail.com."`;
 
-const MODEL = (process.env.OPENROUTER_MODEL || 'openrouter/free').trim();
-const FALLBACK_MODEL = (process.env.OPENROUTER_FALLBACK_MODEL || 'google/gemma-4-31b-it:free').trim();
+async function callOpenRouter(messages, systemPrompt) {
+  const models = [
+    'meta-llama/llama-3.3-70b-instruct:free',
+    'google/gemma-3-27b-it:free',
+    process.env.OPENROUTER_MODEL,
+    process.env.OPENROUTER_FALLBACK_MODEL
+  ].filter(Boolean);
+
+  let lastError;
+  for (const model of models) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+
+      const payload = {
+        model,
+        messages: systemPrompt ? [{ role: 'system', content: systemPrompt }, ...messages] : messages,
+        max_tokens: 200,
+        temperature: 0.7,
+      };
+
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+          'HTTP-Referer': process.env.CORS_ORIGIN?.split(',')[0] || 'http://localhost:3000',
+          'X-OpenRouter-Title': 'Apex Recovery',
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeout);
+
+      if (!response.ok) {
+        const err = await response.text();
+        throw new Error(`OpenRouter error ${response.status}: ${err}`);
+      }
+
+      const data = await response.json();
+      let content = data?.choices?.[0]?.message?.content || "I'm here to help. Please try again.";
+      content = content
+        .replace(/<thinking>[\s\S]*?<\/thinking>/gi, '')
+        .replace(/<\|thinking\|>[\s\S]*?<\/thinking\|>/gi, '')
+        .replace(/\*\*thinking\*\*[\s\S]*?\n\n/gmi, '')
+        .replace(/thinking out loud[\s\S]*?\n\n/gmi, '')
+        .replace(/thinking:[\s\S]*?\n\n/gmi, '')
+        .replace(/^Let me think[\s\S]*?\n\n/gmi, '')
+        .replace(/First,? I need to/gmi, '')
+        .replace(/I need to (think|understand|analyze)[\s\S]*?\n\n/gmi, '')
+        .trim();
+      return content;
+    } catch (err) {
+      lastError = err;
+      console.warn(`OpenRouter model ${model} failed:`, err.message);
+    }
+  }
+  throw lastError;
+}
+
+async function callGemini(messages, systemPrompt) {
+  if (!geminiAI) throw new Error('Gemini API key not configured');
+  
+  const model = geminiAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  
+  const formattedMessages = messages.map(msg => ({
+    role: msg.role === 'user' ? 'user' : 'model',
+    parts: [{ text: msg.content }]
+  }));
+  
+  const chat = model.startChat({
+    history: systemPrompt ? [{
+      role: 'user',
+      parts: [{ text: systemPrompt + "\n\nRespond concisely with direct actionable advice. Do not show thinking." }]
+    }, {
+      role: 'model',
+      parts: [{ text: "Okay, I understand. I am Apex Recovery AI." }]
+    }].concat(formattedMessages.slice(0, -1)) : formattedMessages.slice(0, -1)
+  });
+  
+  const result = await chat.sendMessage(messages[messages.length - 1].content);
+  let content = result.response.text();
+  // Strip thinking patterns
+  content = content.replace(/thinking:[\s\S]*?\n\n/gmi, '').replace(/\*\*thinking\*\*[\s\S]*?\n\n/gmi, '').trim();
+  return content;
+}
 
 const chatWithAI = catchAsync(async (req, res) => {
   const { messages, system } = req.body;
@@ -48,117 +123,53 @@ const chatWithAI = catchAsync(async (req, res) => {
     return res.status(400).json({ error: 'Invalid request: messages array required' });
   }
 
-  if (!process.env.GROQ_API_KEY && !process.env.GEMINI_API_KEY && !process.env.OPENROUTER_API_KEY) {
+  const hasAnyKey = process.env.OPENROUTER_API_KEY || process.env.GEMINI_API_KEY;
+  if (!hasAnyKey) {
     return res.status(500).json({
-      error: 'No AI API key configured. Set GROQ_API_KEY, GEMINI_API_KEY, or OPENROUTER_API_KEY in .env.'
+      error: 'No AI API key configured. Set OPENROUTER_API_KEY or GEMINI_API_KEY in .env.'
     });
   }
 
+  const finalSystem = system || SYSTEM_PROMPT;
+  let replyText = 'I am here with you. Can you tell me more?';
+
   try {
-    let replyText = 'I am here with you. Can you tell me more?';
-    const finalSystem = system || SYSTEM_PROMPT;
-
-    if (process.env.AI_PROVIDER === 'gemini' && geminiAI) {
-      // Gemini API call
-      const model = geminiAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-pro' });
-      const history = messages.map(msg => ({
-        role: msg.role === 'user' ? 'user' : 'model',
-        parts: [{ text: msg.content }]
-      }));
-
-      if (finalSystem) {
-        history.unshift({ role: 'user', parts: [{ text: finalSystem }] });
-        history.unshift({ role: 'model', parts: [{ text: 'Okay, I understand. I will act as Apex Recovery AI.' }] });
-      }
-
-      const result = await model.startChat({ history }).sendMessage(messages[messages.length - 1].content);
-      const response = await result.response;
-      replyText = response.text();
-
-} else if (process.env.AI_PROVIDER === 'openrouter') {
-      if (!process.env.OPENROUTER_API_KEY) {
-        return res.status(500).json({ error: 'OpenRouter API key not configured. Set OPENROUTER_API_KEY in .env.' });
-      }
-
-      const callModel = async (modelSlug) => {
-        const payload = {
-          model: modelSlug,
-          max_tokens: 2000,
-          messages: (finalSystem ? [{ role: 'system', content: finalSystem }] : []).concat(messages),
-        };
-
-        let data;
-        if (openRouterChatCreate) {
-          const res = await openRouterChatCreate(openRouterClient, {
-            body: JSON.stringify(payload),
-            headers: { 'Content-Type': 'application/json' },
-            method: 'POST',
-          });
-          if (!res.ok) {
-            const errBody = await res.text();
-            throw { status: res.status, body: errBody };
-          }
-          data = await res.json();
-        } else {
-          const orRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-              'HTTP-Referer': process.env.CORS_ORIGIN?.split(',')[0] || 'http://localhost:3000',
-              'X-OpenRouter-Title': 'Apex Recovery',
-            },
-            body: JSON.stringify(payload),
-          });
-
-          if (!orRes.ok) {
-            const errBody = await orRes.text();
-            throw { status: orRes.status, body: errBody };
-          }
-          data = await orRes.json();
-        }
-
-        replyText = data?.choices?.[0]?.message?.content;
-        if (!replyText) {
-          console.error('OpenRouter unexpected response for model', modelSlug, JSON.stringify(data));
-          throw { status: 500, body: 'Empty response' };
-        }
-      };
-
+    // Try OpenRouter first (fastest), then Gemini as fallback
+    if (AI_PROVIDER === 'openrouter' && OPENROUTER_API_KEY) {
       try {
-        await callModel(MODEL);
+        replyText = await callOpenRouter(messages, finalSystem);
       } catch (err) {
-        const isModelError = err.status === 404 || /No endpoints found/i.test(err.body || '');
-        if (!isModelError) {
-          console.error('OpenRouter error:', err.status, err.body);
-          return res.status(err.status || 500).json({ error: `OpenRouter error ${err.status || 500}` });
-        }
-        console.warn('Primary OpenRouter model unavailable, falling back to', FALLBACK_MODEL);
-        try {
-          await callModel(FALLBACK_MODEL);
-        } catch (fallbackErr) {
-          console.error('OpenRouter fallback failed:', fallbackErr.status, fallbackErr.body);
-          return res.status(502).json({ error: 'AI is temporarily unavailable. Please try again shortly.' });
+        console.warn('OpenRouter failed, trying Gemini:', err.message);
+        if (geminiAI) {
+          replyText = await callGemini(messages, finalSystem);
+        } else {
+          throw err;
         }
       }
+    } else if (AI_PROVIDER === 'gemini' && geminiAI) {
+      replyText = await callGemini(messages, finalSystem);
+    } else if (OPENROUTER_API_KEY) {
+      replyText = await callOpenRouter(messages, finalSystem);
+    } else if (geminiAI) {
+      replyText = await callGemini(messages, finalSystem);
     }
-    
-    if (req.user) {
-      const chatSession = new ChatMessage({
-        userId: req.user._id,
-        messages: [
-          ...messages.map(m => ({ role: m.role, content: m.content })),
-          { role: 'assistant', content: replyText }
-        ]
-      });
-      await chatSession.save();
-    }
-
-    res.json({ content: [{ type: 'text', text: replyText }] });
   } catch (err) {
-    console.error('Server fetch error:', err.message);
-    res.status(500).json({ error: 'Server encountered an issue. Please try again later.' });
+    console.error('AI error:', err.message);
+    return res.status(502).json({ error: 'AI is temporarily unavailable. Please try again shortly.' });
   }
+
+  if (req.user) {
+    const chatSession = new ChatMessage({
+      userId: req.user._id,
+      messages: [
+        ...messages.map(m => ({ role: m.role, content: m.content })),
+        { role: 'assistant', content: replyText }
+      ]
+    });
+    await chatSession.save();
+  }
+
+  res.json({ content: [{ type: 'text', text: replyText }] });
 });
 
 const getUserChatHistory = catchAsync(async (req, res) => {

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const backendApi = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
+  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/\/+$/, ''),
   headers: {
     'Content-Type': 'application/json',
   },

@@ -1,6 +1,6 @@
 "use client";
 
-import axios from "axios";
+import backendApi from "../../lib/api";
 import { useState } from "react";
 
 export default function AdminPage() {
@@ -14,7 +14,7 @@ export default function AdminPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`, { email, password });
+      const response = await backendApi.post('/auth/login', { email, password });
       localStorage.setItem("token", response.data.token);
       if (email === process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
         setIsAuthenticated(true);
@@ -28,7 +28,7 @@ export default function AdminPage() {
   const fetchBlogs = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/blogs`, { headers: { Authorization: `Bearer ${token}` } });
+      const response = await backendApi.get('/blogs', { headers: { Authorization: `Bearer ${token}` } });
       setBlogs(response.data.blogs || []);
     } catch (error) {
       console.error("Error fetching blogs:", error);
@@ -39,7 +39,7 @@ export default function AdminPage() {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/blogs`, newBlog, { headers: { Authorization: `Bearer ${token}` } });
+      await backendApi.post('/blogs', newBlog, { headers: { Authorization: `Bearer ${token}` } });
       setNewBlog({ title: "", slug: "", excerpt: "", content: "", category: "all", heroEmoji: "📰" });
       fetchBlogs();
     } catch (error) {
@@ -53,7 +53,7 @@ export default function AdminPage() {
     if (!confirm("Delete this blog post?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/blogs/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      await backendApi.delete(`/blogs/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       fetchBlogs();
     } catch (error) {
       alert("Error deleting blog");
