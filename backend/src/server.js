@@ -3,17 +3,9 @@ const connectDB = require('./config/db');
 
 connectDB();
 
-const PORT = process.env.PORT || 5000;
+const handler = (req, res) => {
+  return app(req, res);
+};
 
-app.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-  if (!process.env.GROQ_API_KEY || process.env.GROQ_API_KEY.includes('YOUR_GROQ_API_KEY_HERE')) {
-    console.log('⚠️  WARNING: Groq API key not set in .env!');
-    console.log('   Please set your free key at: https://console.groq.com');
-  } else {
-    console.log('🔑 AI advisor is ready!');
-  }
-  if (process.env.OPENROUTER_API_KEY) {
-    console.log(`🔑 OpenRouter API key is set (provider: ${process.env.AI_PROVIDER || 'openrouter'}, model: ${process.env.OPENROUTER_MODEL || 'default'})`);
-  }
-});
+module.exports = handler;
+module.exports.default = handler;
