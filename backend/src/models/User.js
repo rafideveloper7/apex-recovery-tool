@@ -18,7 +18,22 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Password is required'],
     minlength: 6,
   },
+  profileImage: {
+    type: String,
+    default: '',
+  },
+  onboardingAnswers: {
+    burnoutFrequency: { type: String, default: '' },
+    sleepHours: { type: String, default: '' },
+    stressLevel: { type: String, default: '' },
+    workplaceSupport: { type: String, default: '' },
+    recoveryTime: { type: String, default: '' },
+  },
   isGoogle: {
+    type: Boolean,
+    default: false,
+  },
+  isAdmin: {
     type: Boolean,
     default: false,
   },

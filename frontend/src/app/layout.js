@@ -3,6 +3,7 @@
 import "./../styles/globals.css";
 import ActivityPanel from "./ActivityPanel";
 import Sidebar from "../components/Sidebar";
+import AuthWrapper from "../components/AuthWrapper";
 import { useState } from "react";
 
 export default function RootLayout({ children }) {
@@ -21,7 +22,9 @@ export default function RootLayout({ children }) {
         </button>
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         <div className={`main-content ${sidebarOpen ? "shifted" : ""}`}>
-          {children}
+          <AuthWrapper>
+            {children}
+          </AuthWrapper>
         </div>
         <ActivityPanel />
       </body>

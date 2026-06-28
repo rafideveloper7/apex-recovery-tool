@@ -15,6 +15,12 @@ export default function Navbar() {
     }
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "/auth";
+  };
+
   return (
     <nav className="nav" role="navigation" aria-label="Main navigation">
       <div className="nav-logo">
@@ -23,7 +29,7 @@ export default function Navbar() {
       </div>
 
       <div className="nav-tabs" role="tablist" id="nav-tabs-desktop">
-        <a href="/" className="nav-tab active">Dashboard</a>
+        <a href="/" className="nav-tab">Dashboard</a>
         <a href="/checkin" className="nav-tab">Check-in</a>
         <a href="/advisor" className="nav-tab">AI Advisor</a>
         <a href="/insights" className="nav-tab">Insights</a>
@@ -32,12 +38,25 @@ export default function Navbar() {
 
       <div className="nav-right">
         <div className="nav-badge"><span className="live-dot"></span>LIVE</div>
-        <button className="nav-btn" style={{ background: "var(--bg3)", color: "var(--text)", border: "1px solid var(--border2)" }} onClick={() => {
-          const panel = document.getElementById("activity-panel");
-          if (panel) panel.style.display = "block";
-        }}>
-          <i className="ti ti-user-circle"></i> <span>{user ? user.name : "My Activity"}</span>
-        </button>
+        {user ? (
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            {user.profileImage && (
+              <img 
+                src={user.profileImage} 
+                alt={user.name} 
+                style={{ width: "32px", height: "32px", borderRadius: "50%", objectFit: "cover" }}
+              />
+            )}
+            <span style={{ color: "var(--text3)", fontSize: "13px" }}>{user.name}</span>
+            <button onClick={handleLogout} className="nav-btn" style={{ background: "var(--bg3)", color: "var(--text)" }}>
+              <i className="ti ti-logout"></i> Logout
+            </button>
+          </div>
+        ) : (
+          <button className="nav-btn" onClick={() => window.location.href = "/auth"}>
+            <i className="ti ti-user-circle"></i> Login
+          </button>
+        )}
         <button className="nav-btn"><i className="ti ti-download"></i> Export</button>
       </div>
     </nav>

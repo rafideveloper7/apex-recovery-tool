@@ -1,6 +1,6 @@
 "use client";
 
-import backendApi from "../../lib/api";
+import backendApi from "@/lib/api";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
@@ -12,7 +12,7 @@ export default function BlogPage() {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const response = await backendApi.get('/blogs', { params: { category: filter } });
+        const response = await backendApi.get('/api/blogs', { params: { category: filter } });
         setBlogs(response.data.blogs || []);
       } catch (error) {
         console.error("Error fetching blogs:", error);
