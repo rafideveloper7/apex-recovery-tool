@@ -1,6 +1,15 @@
 require('dotenv').config({ path: '../.env' });
 
 module.exports = async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', 'https://apexrecovery.vercel.app');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   res.send(`
     <html>
       <body style="font-family:sans-serif;padding:40px;background:#0D1B3E;color:#fff">

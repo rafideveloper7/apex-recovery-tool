@@ -1,0 +1,16 @@
+{
+  "functions": {
+    "api/index.js": { "runtime": "nodejs20.x" },
+    "api/auth/register.js": { "runtime": "nodejs20.x" },
+    "api/auth/login.js": { "runtime": "nodejs20.x" },
+    "api/auth/me.js": { "runtime": "nodejs20.x" },
+    "api/auth/admin/login.js": { "runtime": "nodejs20.x" },
+    "api/auth/google.js": { "runtime": "nodejs20.x" },
+    "api/chat.js": { "runtime": "nodejs20.x" },
+    "api/data/checkin.js": { "runtime": "nodejs20.x" },
+    "api/admin/stats.js": { "runtime": "nodejs20.x" },
+    "api/admin/users.js": { "runtime": "nodejs20.x" },
+    "api/admin/blogs.js": { "runtime": "nodejs20.x" },
+    "api/blogs/index.js": { "runtime": "nodejs20.x" }
+  }
+}

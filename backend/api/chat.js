@@ -1,6 +1,7 @@
 require('dotenv').config({ path: '../.env' });
 const ChatMessage = require('../src/models/ChatMessage');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const connectDB = require('../src/config/db');
 
 const geminiAI = process.env.GEMINI_API_KEY ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY) : null;
 const AI_PROVIDER = process.env.AI_PROVIDER || 'openrouter';
@@ -72,6 +73,15 @@ async function callOpenRouter(messages, systemPrompt) {
 }
 
 module.exports = async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', 'https://apexrecovery.vercel.app');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   try {
     if (req.method !== 'POST') {
       return res.status(405).json({ error: 'Method not allowed' });
@@ -89,6 +99,7 @@ module.exports = async function handler(req, res) {
       });
     }
 
+    await connectDB();
     const finalSystem = system || SYSTEM_PROMPT;
     let replyText = 'I am here with you.';
 
